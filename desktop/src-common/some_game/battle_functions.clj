@@ -12,6 +12,14 @@
     (actor! actor-entity :set-touchable Touchable/childrenOnly)
     (actor! actor-entity :set-touchable Touchable/disabled)))
 
+(defn get-table-contents [actor-table]
+  (map #(.getActor %1) (table! actor-table :get-cells)))
+
+(defn swap-visible! [actor-entity]
+  (let [visible? (not (actor! actor-entity :is-visible))]
+    (dorun (map #(actor! %1 :set-visible visible?) (get-table-contents actor-entity)))
+    (actor! actor-entity :set-visible visible?)))
+
 (defn convert-player [player screen]
   (assoc player
     :x (- (* (width screen) 0.8) (:x (get-entity-center player)))
@@ -61,7 +69,7 @@
     (if (<= (:health attacked-enemy) 0)
       (change-to-overworld! (normalize-overworld (assoc (:stored-overworld entities) :sprites (dissoc (get-in entities [:stored-overworld :sprites]) :enemy)))))
     (do
-      (swap-touchable! (get-in entities [:sprites :table]))
+      (swap-visible! (get-in entities [:sprites :table]))
       (assoc-in entities [:sprites :enemy] attacked-enemy))))
 
 (defn player-turn [screen entities]
@@ -69,7 +77,7 @@
         clicked-actor (actor! spell-table :hit (- (:x spell-table) (:input-x screen)) (- (- (height screen) (:input-y screen)) (:y spell-table)) true)]
     (if (not (nil? clicked-actor))
       (do
-        (swap-touchable! spell-table)
+        (swap-visible! spell-table)
         (reset! current-attack (get (get-in entities [:sprites :player :spells]) (str (label! clicked-actor :get-text))))
         (add-timer! screen :cast-animation-complete (animation! (:cast (get-in entities [:sprites :player :animations])) :get-animation-duration))
         (assoc-in entities [:sprites :player :current-animation] :cast))

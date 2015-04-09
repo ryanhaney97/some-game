@@ -13,7 +13,7 @@
           :priority 2
           :animations {:walking (make-animation "player" "walking" 2 (play-mode :loop))
                        :idle (make-animation "player" "idle" 1 (play-mode :normal))
-                       :cast (make-animation "player" "cast" 3 (play-mode :normal) 0.3)}
+                       :cast (make-animation "player" "cast" 3 (play-mode :normal) 0.35)}
           :current-animation :idle
           :health 20
           :stats {:max-health 20
@@ -24,7 +24,7 @@
                   :id 1
                   :ego 1
                   :superego 1}
-          :spells (merge {} (make-spell "fireball" 3 :other) (make-spell "something" 5 :other))
+          :spells (merge {} (make-spell "fireball" 3 :fire) (make-spell "something" 5 :other))
           :vx 0
           :vy 0))))
 
@@ -40,8 +40,8 @@
     (-> enemy
         (assoc
           :priority 1
-          :x (+ (:x (get-entity-center player)) (- (rand-int 500) 250))
-          :y (+ (:y (get-entity-center player)) (- (rand-int 500) 250))
+          :x (+ (:x (get-entity-center player)) (:x player) (- 250 (rand-int 500)))
+          :y (+ (:y (get-entity-center player)) (:y player) (- 250 (rand-int 500)))
           :health 20
           :stats {:max-health 20
                   :memory 1
