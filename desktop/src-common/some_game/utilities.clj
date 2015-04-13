@@ -33,7 +33,8 @@
    (make-animation entity-name general-name frames pm 0.2)))
 
 (defn reset-animation! [animation-name]
-  (swap! animation-start-times dissoc animation-name))
+  (if (get @animation-start-times animation-name)
+   (swap! animation-start-times dissoc animation-name)))
 
 (defn center-on! [camera entity]
   (.set (.position camera) (+ (:x entity) (:x (get-entity-center entity))) (+ (:y entity) (:y (get-entity-center entity))) 0))
@@ -92,7 +93,7 @@
        (sort-by :priority)))
 
 (defn make-spell [spell-name spell-base-damage spell-type]
-  {spell-name {:damage spell-base-damage :spell-type spell-type}})
+  {spell-name {:damage spell-base-damage :type spell-type}})
 
 (defn normalize-overworld [entities]
   (-> entities

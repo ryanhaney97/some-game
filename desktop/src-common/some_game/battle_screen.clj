@@ -32,10 +32,13 @@
   (fn [screen [entities _]]
     (condp = (:id screen)
       :book-loaded (assoc-in entities [:sprites :table] (make-spell-list screen (get-in entities [:sprites :player]) (get-in entities [:sprites :book])))
-      :cast-animation-complete (do (reset-animation! :cast)
-                                   (-> entities
-                                       (assoc-in [:sprites :player :current-animation] :idle)
-                                       ((partial damage-enemy screen))))
+      :cast-animation-complete (do
+                                 (reset-animation! (get-animation-from-type (:type @current-attack)))
+                                 (-> entities
+                                     (remove-projectiles)
+                                     (assoc-in [:sprites :player :current-animation] :idle)
+                                     ((partial damage-enemy screen))))
+      :spawn-fireball (assoc-in entities [:sprites :projectile] (make-fireball (get-in entities [:sprites :player])))
       entities))
 
   :on-render
@@ -44,6 +47,7 @@
     (render! screen (make-renderable entities))
     (->> entities
          (animation-handler screen)
+         (handle-projectiles screen)
          (update-positions screen)))
 
   :on-resize

@@ -13,7 +13,8 @@
           :priority 2
           :animations {:walking (make-animation "player" "walking" 2 (play-mode :loop))
                        :idle (make-animation "player" "idle" 1 (play-mode :normal))
-                       :cast (make-animation "player" "cast" 3 (play-mode :normal) 0.35)}
+                       :cast (make-animation "player" "cast" 3 (play-mode :normal) 0.35)
+                       :cast-fire (make-animation "player" "cast-fire" 3 (play-mode :normal) 0.35)}
           :current-animation :idle
           :health 20
           :stats {:max-health 20
@@ -24,7 +25,7 @@
                   :id 1
                   :ego 1
                   :superego 1}
-          :spells (merge {} (make-spell "fireball" 3 :fire) (make-spell "something" 5 :other))
+          :spells (merge {} (make-spell "fireball" 5 :fire) (make-spell "something" 3 :other))
           :vx 0
           :vy 0))))
 
@@ -51,7 +52,7 @@
                   :id 1
                   :ego 1
                   :superego 1}
-          :spells (merge {} (make-spell "fireball" 3 :fire))
+          :spells (merge {} (make-spell "fireball" 5 :fire))
           :vx 0
           :vy 0))))
 
