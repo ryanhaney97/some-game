@@ -21,6 +21,21 @@
     (dorun (map #(actor! %1 :set-visible visible?) (get-table-contents actor-entity)))
     (actor! actor-entity :set-visible visible?)))
 
+(defn make-bar-base [entity]
+  (let [texture-region (texture "health-bar/health-bar-empty.png")]
+    (assoc texture-region
+      :x (- (:x entity) (/ (texture! texture-region :get-region-width) 4))
+      :y (+ (:y entity) (texture! texture-region :get-region-height) 55)
+      :priority 1)))
+
+(defn make-bar [entity]
+  (let [texture-region (texture "health-bar/health-bar-full.png")]
+    (assoc texture-region
+      :x (- (:x entity) (/ (texture! texture-region :get-region-width) 4))
+      :y (+ (:y entity) (texture! texture-region :get-region-height) 55)
+      :priority 2
+      :max-width (texture! texture-region :get-region-width))))
+
 (defn remove-projectiles [entities]
   (if (get-in entities [:sprites :projectile])
     (assoc entities :sprites (dissoc (:sprites entities) :projectile))
@@ -90,7 +105,8 @@
         attacked-enemy (assoc enemy :health (- (:health enemy) (:damage attack)))]
     (if (<= (:health attacked-enemy) 0)
       (change-to-overworld! (normalize-overworld (assoc (:stored-overworld entities) :sprites (dissoc (get-in entities [:stored-overworld :sprites]) :enemy)))))
-    (do
+    (let [health-bar (get-in entities [:sprites :enemy-health])]
+      (texture! health-bar :set-region-width (* (:max-width health-bar) (/ (:health attacked-enemy) (get-in attacked-enemy [:stats :max-health]))))
       (swap-visible! (get-in entities [:sprites :table]))
       (assoc-in entities [:sprites :enemy] attacked-enemy))))
 
@@ -98,13 +114,15 @@
   (let [projectile (get-in entities [:sprites :projectile])]
     (if projectile
       (let [owner (if (texture! projectile :is-flip-x) :player :enemy)
-            enemy (if (texture! projectile :is-flip-x) :enemy :player)]
+            enemy (if (texture! projectile :is-flip-x) :enemy :player)
+            enemy-entity (get-in entities [:sprites enemy])]
         (if (and (not= 0 (:vx projectile)) (colliding? projectile (get-in entities [:sprites enemy])))
           (do
             (add-timer! screen :cast-animation-complete (animation! (:explode (:animations projectile)) :get-animation-duration))
             (-> entities
                 (assoc-in [:sprites :projectile :vx] 0)
-                (assoc-in [:sprites :projectile :y] (get-in entities [:sprites enemy :y]))
+                (assoc-in [:sprites :projectile :y] (:y enemy-entity))
+                (assoc-in [:sprites :projectile :x] (- (+ (:x enemy-entity) (:x (get-entity-center enemy-entity))) 9))
                 (assoc-in [:sprites :projectile :current-animation] :explode)))
           (assoc-in entities [:sprites :projectile :x] (+ (:vx projectile) (:x projectile)))))
       entities)))

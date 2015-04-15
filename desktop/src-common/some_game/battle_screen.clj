@@ -20,11 +20,15 @@
     (let [player (convert-player (get-in screen [:entities :sprites :player]) screen)
           enemy (convert-enemy (:enemy screen) screen)
           book (make-book screen)
+          enemy-health-base (make-bar-base enemy)
+          enemy-health (make-bar enemy)
           new-entities (assoc entities
                          :stored-overworld (:entities screen)
                          :sprites {:player player
                                    :enemy enemy
-                                   :book book})]
+                                   :book book
+                                   :enemy-health-base enemy-health-base
+                                   :enemy-health enemy-health})]
       (.set (.position (:camera screen)) (/ (width screen) 2) (/ (height screen) 2) 0)
       new-entities))
 

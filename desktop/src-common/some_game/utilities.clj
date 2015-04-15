@@ -26,6 +26,8 @@
 (defn get-entity-center [entity]
   {:x (/ (texture! entity :get-region-width) 2.0) :y (/ (texture! entity :get-region-height) 2.0)})
 
+(defn align-entity-center [entity])
+
 (defn make-animation
   ([entity-name general-name frames pm frame-duration]
    (animation frame-duration (into [] (map #(texture (str entity-name "/" general-name "/" general-name "" %1 ".png")) (range 1 (inc frames)))) :set-play-mode pm))
